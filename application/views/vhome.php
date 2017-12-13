@@ -382,19 +382,38 @@
 
     $(document).on('click','#start', function(){
       learningRate = $('#learning-rate').val();
-      createArray();
-      retrain();
-      console.log(learnData);
-      input.activate(learnData); // Coba activete
-      var result = output.activate();
-      console.log(learningRate);
-      console.log("Dengue Neuron: " + result[0] * 100 + "%");
+      if (learnData.length < 10) {
+        alert("Input harus diisi semua");
+      } else {
+        createArray();
+        retrain();
+        console.log(learnData);
+        input.activate(learnData); // Coba activete
+        var result = output.activate();
+        console.log(learningRate);
+        console.log("Dengue Neuron: " + result[0] * 100 + "%");
 
-      //tampilkan di hasil
-      var hasil = result[0] * 100;
-      var tekshasil ='<p>'+hasil+' %</p>';
-      $('div.hsl').find('div#hasil').html(tekshasil);
-      $('#hasil').html(tekshasil);
+        //tampilkan di hasil
+        var hasil = result[0] * 100;
+        var tekshasil ='<p>'+hasil+' %</p>';
+        $('div.hsl').find('div#hasil').html(tekshasil);
+        $('#hasil').html(tekshasil);
+      }
+
+    }).on('click','#reset', function(){
+      $('#result').empty();
+      $('#result2').empty();
+      $('#result3').empty();
+      $('#result4').empty();
+      document.getElementById("start").style.display = "none";
+      $('#pilihkota div').first().find('div.col-md-2').show();
+      $('.rs').not(':first').remove();
+      $('#result').empty();
+      $('#result2').empty();
+      $('#result3').empty();
+      $('#result4').empty();
+      nodes.splice(0,nodes.length);
+      clearMap();
     });
 
     function createArray() {
@@ -431,17 +450,13 @@
     {input: [0,1,0,0,0,0,0,0,0,0], output: [0]},
     {input: [0,1,0,0,0,1,0,0,0,0], output: [0]},
     {input: [0,0,1,0,0,0,1,0,0,0], output: [0]},
-<<<<<<< HEAD
 
-=======
->>>>>>> 4d472b85af287fae26e82647e608362f3e2031c3
     {input: [1,0,0,0,1,1,1,0,0,0], output: [0]},
     {input: [1,0,0,0,0,1,0,0,0,0], output: [0]},
     {input: [0,1,0,0,0,1,0,0,0,0], output: [0]},
     {input: [0,0,0,1,0,0,1,0,0,0], output: [0]},
     {input: [0,0,1,1,0,0,0,0,0,0], output: [0]},
     {input: [0,0,0,0,0,1,0,0,0,0], output: [0]},
-<<<<<<< HEAD
     {input: [0,0,0,0,1,0,0,0,0,0], output: [0]},
     {input: [0,0,1,0,0,0,1,0,0,0], output: [0]},
     {input: [1,1,1,0,0,0,0,0,0,0], output: [0]},
@@ -458,22 +473,11 @@
     {input: [1,0,1,0,0,0,0,0,0,0], output: [0]},
     {input: [1,1,0,0,0,0,0,0,0,0], output: [0]},
 
-=======
->>>>>>> 4d472b85af287fae26e82647e608362f3e2031c3
     {input: [0,0,0,0,0,0,0,1,1,1], output: [1]},
     {input: [0,0,0,0,1,0,0,1,1,1], output: [1]},
     {input: [1,1,0,0,1,1,0,0,0,0], output: [1]},
     {input: [1,1,1,0,1,1,0,0,1,1], output: [1]},
     {input: [0,0,0,0,0,0,0,1,0,1], output: [1]},
-<<<<<<< HEAD
-=======
-    {input: [1,0,0,0,0,1,0,1,0,1], output: [1]},
-    {input: [0,0,1,0,0,0,0,1,0,1], output: [1]},
-    {input: [1,0,0,1,1,0,1,1,1,1], output: [1]},
-    {input: [1,1,0,0,0,0,0,0,0,0], output: [1]},
-    {input: [0,1,0,0,1,1,1,1,1,1], output: [1]},
-    ];
->>>>>>> 4d472b85af287fae26e82647e608362f3e2031c3
 
     {input: [0,0,0,0,0,0,0,1,0,1], output: [1]},
     {input: [1,0,0,0,0,1,0,1,0,1], output: [1]},
