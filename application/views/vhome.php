@@ -336,7 +336,7 @@
                           </td>
                       </tr>
                       <tr>
-                          <td>Jumlah Hidden Layer : </td>
+                          <td>Jumlah Node Hidden Layer : </td>
                           <td>
                             <div class="input-group col-md-12">
                               <select class="mr form-control"  id="hiddenCount">
