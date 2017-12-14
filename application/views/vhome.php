@@ -319,13 +319,59 @@
                           </td>
                       </tr>
                       <tr>
+                          <td>Epoch : </td>
+                          <td>
+                            <div class="input-group col-md-12">
+                              <select class="mr form-control"  id="epoch">
+                                  <option value="1">1</option>
+                                  <option value="20">20</option>
+                                  <option value="50">50</option>
+                                  <option value="100">100</option>
+                                  <option value="500">500</option>
+                                  <option value="1000" selected="selected">1000</option>
+                                  <option value="2000">2000</option>
+                                  <option value="5000">5000</option>
+                              </select>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>Jumlah Hidden Layer : </td>
+                          <td>
+                            <div class="input-group col-md-12">
+                              <select class="mr form-control"  id="hiddenCount">
+                                  <option value="1">1</option>
+                                  <option value="2">2</option>
+                                  <option value="3">3</option>
+                                  <option value="5"selected="selected">5</option>
+                                  <option value="10">10</option>
+                                  <option value="20">20</option>
+                                  <option value="50">50</option>
+                                  <option value="100">100</option>
+                              </select>
+                              </div>
+                          </td>
+                      </tr>
+                      <tr>
                           <td colspan="3" ><b>Hasil Deteksi</b></td>
                       </tr>
                       <tr>
                         <td colspan="3">
                         <div class=" hsl" >
-                          <p >Dengue Neuron Output = </p>
+                          <p >Dengue Neuron (No Hidden Layer) Output = </p>
                           <div id="hasil" >
+
+                          </div>
+                          <p >Dengan Hidden Layer Output = </p>
+                          <div id="hasil2" >
+
+                          </div>
+                          <p >Dengan Deep Learning Output = </p>
+                          <div id="hasil3" >
+
+                          </div>
+                          <p >Dengan Long Short-term Memory Output = </p>
+                          <div id="hasil4" >
 
                           </div>
                         </div>
@@ -379,25 +425,52 @@
 
     var learningRate;
     var learnData = [];
+    var epoch;
+    var hiddenCount;
 
     $(document).on('click','#start', function(){
       learningRate = $('#learning-rate').val();
+      epoch = $('#epoch').val()
+      hiddenCount = $('#hiddenCount').val()
       if (learnData.length < 10) {
         alert("Input harus diisi semua");
       } else {
         createArray();
         retrain();
+        trainHidden();
+        trainDeep();
+        trainLSTM();
         console.log(learnData);
-        input.activate(learnData); // Coba activete
+        input.activate(learnData);
         var result = output.activate();
-        console.log(learningRate);
-        console.log("Dengue Neuron: " + result[0] * 100 + "%");
+        var hasilhidden = myNetwork.activate(learnData);
+        var hasildeep = myDeepNetwork.activate(learnData);
+        var hasilLSTM = myLSTM.activate(learnData);
+        console.log("Learning Rate : " +learningRate);
+        console.log("Epoch training : " +epoch);
+        console.log("Node Hidden Layer : " +hiddenCount);
+        console.log("Dengue No Hidden Layer : " + result[0] * 100 + "%");
+        console.log("Dengan Hidden Layer : " + hasilhidden[0] * 100 + "%");
+        console.log("Dengan Deep Learning Neuron : "+ hasildeep[0] * 100 + "%");
+        console.log("Dengan LSTM Neuron : "+ hasilLSTM[0] * 100 + "%");
 
         //tampilkan di hasil
         var hasil = result[0] * 100;
+        var hasil2 = hasilhidden[0] * 100;
+        var hasil3 = hasildeep[0] * 100;
+        var hasil4 = hasilLSTM[0] * 100;
         var tekshasil ='<p>'+hasil+' %</p>';
+        var tekshasil2 ='<p>'+hasil2+' %</p>';
+        var tekshasil3 ='<p>'+hasil3+' %</p>';
+        var tekshasil4 ='<p>'+hasil4+' %</p>';
         $('div.hsl').find('div#hasil').html(tekshasil);
+        $('div.hsl').find('div#hasil2').html(tekshasil2);
+        $('div.hsl').find('div#hasil3').html(tekshasil3);
+        $('div.hsl').find('div#hasil4').html(tekshasil4);
         $('#hasil').html(tekshasil);
+        $('#hasil2').html(tekshasil2);
+        $('#hasil3').html(tekshasil3);
+        $('#hasil4').html(tekshasil4);
       }
 
     }).on('click','#reset', function(){
@@ -416,6 +489,7 @@
       clearMap();
     });
 
+    //tangkap input
     function createArray() {
     learnData[0] = $('input[name=fever]:checked').val();
     learnData[1] = $('input[name=nausea]:checked').val();
@@ -429,22 +503,7 @@
     learnData[9] = $('input[name=bleeding]:checked').val();
     }
 
-    function createSubArray(name){
-    var arr = new Array();
-    elems = document.getElementsByName(name);
-    for (var i=0;i<elems.length;i++){
-        if (elems[i].checked){
-            arr[name] =  elems[i].value;
-        }
-    }
-    return arr;
-}
-
-    var input = new synaptic.Layer(10); // Two inputs
-    var output = new synaptic.Layer(1); // Three outputs
-
-    input.project(output); // Connect input to output
-
+    //training data 80
     var trainingData = [
     {input: [0,0,0,0,0,0,1,0,0,0], output: [0]},
     {input: [0,1,0,0,0,0,0,0,0,0], output: [0]},
@@ -546,7 +605,12 @@
 
     ];
 
-    // Start the training
+    //simple neuron network no hidden layer
+    var input = new synaptic.Layer(10); // Ten inputs
+    var output = new synaptic.Layer(1); // One outputs
+
+    input.project(output); // Connect input to output
+
     function train() {
         for(var i = 0; i < trainingData.length; i++) {
             input.activate(trainingData[i]["input"]);
@@ -556,11 +620,65 @@
     }
 
     function retrain() {
-        for(var i = 0; i < 1000; i++) {
+        for(var i = 0; i < epoch; i++) {
             trainingData = _.shuffle(trainingData);
             train();
         }
     }
+
+
+    //with one hidden layer
+    var myNetwork = new synaptic.Architect.Perceptron(
+        10, // Input layer with 10 neurons
+        5, // First hidden layer with 5 neurons
+        1 // Output layer with 1 neurons
+    );
+
+    function trainHidden(){
+      var myHidTrainer = new synaptic.Trainer(myNetwork); // Create trainer
+          myHidTrainer.train(trainingData, {
+              rate: learningRate,
+              iterations: epoch,
+              shuffle: true
+      }); // Train with training data
+
+    }
+
+      //with deep learning (two hidden layer)
+      var myDeepNetwork = new synaptic.Architect.Perceptron(
+          10, // Input layer with 10 neurons
+          5, // First hidden layer with 3 neurons
+          3, // Second hidden layer with 3 neurons
+          1 // Output layer with 1 neurons
+      );
+
+      function trainDeep(){
+        var myTrainer = new synaptic.Trainer(myDeepNetwork); // Create trainer
+            myTrainer.train(trainingData, {
+                rate: learningRate,
+                iterations: epoch,
+                shuffle: true
+        }); // Train with training data
+
+      }
+
+      //with LSTM
+      var myLSTM = new synaptic.Architect.LSTM(
+        10, // Input Gate 10 neurons
+        15, // Memory Cell
+        1 //Output layer
+      );
+
+      function trainLSTM(){
+        var myLSTMTrainer = new synaptic.Trainer(myLSTM); // Create trainer
+            myLSTMTrainer.train(trainingData, {
+                rate: learningRate,
+                iterations: 10,
+                shuffle: true
+        }); // Train with training data
+
+      }
+
 
 
 
